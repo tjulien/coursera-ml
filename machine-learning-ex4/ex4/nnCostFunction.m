@@ -59,6 +59,22 @@ end
 
 J = J / m;
 
+reg = 0;
+for j = 1:size(Theta1, 1)
+    for k = 2:size(Theta1, 2)
+        reg = reg + Theta1(j, k) ^ 2;
+    end
+end
+
+for j = 1:size(Theta2, 1)
+    for k = 2:size(Theta2, 2)
+        reg = reg + Theta2(j, k) ^ 2;
+    end
+end
+
+reg = reg * (lambda / (2 * m));
+
+J = J + reg;
 
 %
 % Part 2: Implement the backpropagation algorithm to compute the gradients
@@ -75,6 +91,29 @@ J = J / m;
 %         Hint: We recommend implementing backpropagation using a for-loop
 %               over the training examples if you are implementing it for the 
 %               first time.
+
+for t = 1:m
+    z_2 = Theta1 * X(t, :)';
+    a_2 = sigmoid(z_2);
+    a_2 = [1; a_2];
+
+    z_3 = Theta2 * a_2;
+    a_3 = sigmoid(z_3);
+    
+    y_k = zeros(num_labels, 1);
+    y_k(y(t)) = 1;
+    
+    d_3 = (a_3 - y_k);
+    
+    d_2 = Theta2' * d_3;
+    d_2 = d_2(2:end) .* sigmoidGradient(z_2);
+    Theta2_grad = Theta2_grad + d_3 * a_2';
+    Theta1_grad = Theta1_grad + d_2 * X(t, :);
+end
+
+Theta1_grad = Theta1_grad ./ m;
+Theta2_grad = Theta2_grad ./ m;
+
 %
 % Part 3: Implement regularization with the cost function and gradients.
 %
@@ -85,7 +124,21 @@ J = J / m;
 %
 
 
+reg_Theta1 = Theta1;
+for i = 1:size(reg_Theta1, 1)
+    reg_Theta1(i, 1) = 0;
+end
 
+reg_Theta1 = reg_Theta1 .* (lambda / m);
+Theta1_grad = Theta1_grad + reg_Theta1;
+
+reg_Theta2 = Theta2;
+for i = 1:size(reg_Theta2, 1)
+    reg_Theta2(i, 1) = 0;
+end
+
+reg_Theta2 = reg_Theta2 .* (lambda / m);
+Theta2_grad = Theta2_grad + reg_Theta2;
 
 
 
