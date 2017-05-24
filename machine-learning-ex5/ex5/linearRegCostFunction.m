@@ -25,6 +25,13 @@ J = J / (2 * m);
 theta_reg = theta(2:end);
 J = J + (lambda / (2 * m)) * theta_reg' * theta_reg;
 
+grad_zero = sum(((X * theta) - y) .* X(:, 1)) / m;
+grad(1, 1) = grad_zero;
+
+for i = 2:size(theta)
+    grad(i) = sum(((X * theta) - y) .* X(:, i)) / m;
+    grad(i) = grad(i) + (lambda * theta(i) / m);
+
 
 % =========================================================================
 
